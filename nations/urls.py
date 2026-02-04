@@ -18,10 +18,11 @@ from django.contrib import admin
 from django.urls import path, include
 from nations import swagger
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/country/', include('countries.urls')),
-    path("api/v1/users/", include('users_part.urls'))
+    path("api/v1/users/", include('users.urls')),
 ]
 
 urlpatterns += swagger.urlpatterns

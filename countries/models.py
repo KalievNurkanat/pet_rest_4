@@ -1,5 +1,5 @@
 from django.db import models
-from users_part.models import CustomUser
+from users.models import CustomUser
 
 class Country(models.Model):
     name = models.CharField()

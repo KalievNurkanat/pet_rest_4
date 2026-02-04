@@ -9,8 +9,9 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
+import os
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,9 +21,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-j&)b(gh_2^^x-se8oo28k9g__bn-kki(we^odj=)&mhbd$^!4g'
-
+SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
 ALLOWED_HOSTS = []
@@ -40,7 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'countries',
     'drf_yasg',
-    'users_part',
+    'users',
     'rest_framework.authtoken'
 ]
 
@@ -57,10 +58,18 @@ SWAGGER_SETTINGS = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ]
 }
 
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": False,
+    "UPDATE_LAST_LOGIN": False,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -112,8 +121,12 @@ WSGI_APPLICATION = 'nations.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get("DB_NAME"),
+        'USER': os.environ.get("DB_USER"),
+        'PASSWORD': os.environ.get("DB_PASSWORD"),
+        'HOST': os.environ.get("DB_HOST"),
+        'PORT': os.environ.get("DB_PORT")
     }
 }
 
@@ -155,4 +168,4 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 
-AUTH_USER_MODEL = 'users_part.CustomUser'
+AUTH_USER_MODEL = 'users.CustomUser'

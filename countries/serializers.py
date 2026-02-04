@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from countries.models import City, Country, Review
 from rest_framework.exceptions import ValidationError
-from users_part.models import CustomUser
+from users.models import CustomUser
 
 class UserBaseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,6 +44,19 @@ class ReviewCitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = "__all__"
+
+    def validate(self, attrs):
+        user = self.context["request"].user
+        count = Review.objects.filter(author=user).count()
+        if count >= 1:
+            raise serializers.ValidationError("You can't write reviews anymore")
+        return attrs
+
+class ReviewCityEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = "__all__"
+
 
 class CityDetailsSerializer(serializers.ModelSerializer):
     country_id = CountrySerializer()

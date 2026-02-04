@@ -1,13 +1,16 @@
 from countries.models import City, Country, Review
 from countries.serializers import (CitySerializer, CountrySerializer,
                                     CityDetailsSerializer, CityEditDetailsSerializer, CountryDetailsSerializer, CityCreateSerializer,
-                                    ReviewCitySerializer)
+                                    ReviewCitySerializer, ReviewCityEditSerializer)
 from django.db.models import Sum, Avg
+from common.permissions import IsAuthenticated, IsGuest, OwnerRights, IsAdmin, NotForAdmin
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
+from rest_framework.exceptions import ValidationError
 # Create your views here.
 
 class CityAPIView(ListCreateAPIView):
-    queryset = City.objects.select_related("cities")
+    permission_classes = [IsAdmin | IsGuest]
+    queryset = City.objects.select_related("country_id")
     def get_serializer_class(self):
         if self.request.method == "GET":
             return CitySerializer
@@ -15,6 +18,7 @@ class CityAPIView(ListCreateAPIView):
 
 class CityDetailAPIView(RetrieveUpdateDestroyAPIView):
     lookup_field = "id"
+    permission_classes = [IsAdmin | IsGuest]
 
     def get_queryset(self):
         if self.request.method == "GET":
@@ -28,6 +32,7 @@ class CityDetailAPIView(RetrieveUpdateDestroyAPIView):
 
 
 class CountryAPIView(ListCreateAPIView):
+    permission_classes = [IsAdmin | IsGuest]
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
 
@@ -37,16 +42,23 @@ class CountryDetailAPIView(RetrieveUpdateDestroyAPIView):
                                                                                             "cities",
                                                                                             "cities__city_rating"
                                                                                         )
+    permission_classes = [IsAdmin | IsGuest]
     serializer_class = CountryDetailsSerializer
     lookup_field = "id"
 
 
 class ReviewCityView(CreateAPIView):
+    permission_classes = [IsAuthenticated & NotForAdmin]
     serializer_class = ReviewCitySerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
 
-
+class ReviewEditView(RetrieveUpdateDestroyAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewCityEditSerializer
+    permission_classes = [OwnerRights]
+    lookup_field = "id"
+    
 
