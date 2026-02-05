@@ -4,12 +4,16 @@ from rest_framework.exceptions import ValidationError
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+class RedisCodeSerializer(serializers.Serializer):
+    code = serializers.CharField()
+
 class SimpleJWTSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
 
-        token['name'] = str(user.birth_date)
+        token['birth_date'] = str(user.birth_date)
+        token['email'] = str(user.email)
 
         return token
     
@@ -42,7 +46,6 @@ class UserRegisterSerializer(UserBaseSerializer):
             birth_date=validated_data["birth_date"],
             is_active=True
         )
-
         return user
     
 

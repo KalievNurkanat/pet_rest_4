@@ -5,7 +5,9 @@ from countries.serializers import (CitySerializer, CountrySerializer,
 from django.db.models import Sum, Avg
 from common.permissions import IsAuthenticated, IsGuest, OwnerRights, IsAdmin, NotForAdmin
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
-from rest_framework.exceptions import ValidationError
+from countries.tasks import send_email, send_daily_report
+from nations.settings import EMAIL_SEND_TO
+from rest_framework.response import Response
 # Create your views here.
 
 class CityAPIView(ListCreateAPIView):
@@ -53,6 +55,9 @@ class ReviewCityView(CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+        user_email = self.request.user.email
+        send_email(user_email)
+        send_daily_report(EMAIL_SEND_TO)
 
 
 class ReviewEditView(RetrieveUpdateDestroyAPIView):

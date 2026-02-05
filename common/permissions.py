@@ -23,5 +23,4 @@ class IsAdmin(BasePermission):
 
 class NotForAdmin(BasePermission):
     def has_permission(self, request, view):
-        if request.user and request.user.is_staff:
-            return False
+        return not request.user.is_staff

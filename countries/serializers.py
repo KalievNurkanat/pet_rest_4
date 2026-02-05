@@ -51,6 +51,8 @@ class ReviewCitySerializer(serializers.ModelSerializer):
         if count >= 1:
             raise serializers.ValidationError("You can't write reviews anymore")
         return attrs
+    
+    
 
 class ReviewCityEditSerializer(serializers.ModelSerializer):
     class Meta:
