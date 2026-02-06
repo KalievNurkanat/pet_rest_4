@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
-from decouple import config
+from decouple import config, Csv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,8 +27,7 @@ SECRET_KEY = config("SECRET_KEY")
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1', cast=Csv())
 
 # Application definition
 
@@ -174,15 +173,15 @@ AUTH_USER_MODEL = 'users.CustomUser'
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/10',
+        'LOCATION': 'redis://redis:6379/10',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient'
         }
     }
 }
 
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/11'
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/12'
+CELERY_BROKER_URL = 'redis://redis:6379/11'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/12'
 
 
 EMAIL_USE_TLS = True
